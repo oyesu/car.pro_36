@@ -42,23 +42,39 @@ const list = SHOW_SENSITIVE_SERVICES ? SERVICES.concat(SENSITIVE_SERVICES) : SER
 list.forEach(s => {
   const el = document.createElement('article');
   el.className = 'card reveal';
-  el.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + ICONS[s.i] + '</svg>' +
-    '<h3>' + s.t + '</h3><p>' + s.d + '</p><span class="price">' + s.p + '</span>';
+  el.innerHTML =
+    '<svg class="icon icon--large" viewBox="0 0 24 24" aria-hidden="true">' + ICONS[s.i] + '</svg>' +
+    '<h3>' + s.t + '</h3>' +
+    '<p>' + s.d + '</p>' +
+    '<span class="card__price">' + s.p + '</span>';
   grid.appendChild(el);
 });
 
 const burger = document.getElementById('burger');
 const nav = document.getElementById('nav');
 burger.addEventListener('click', () => {
-  const open = nav.classList.toggle('open');
+  const open = nav.classList.toggle('nav--open');
   burger.setAttribute('aria-expanded', open);
 });
-nav.addEventListener('click', e => { if (e.target.tagName === 'A') nav.classList.remove('open'); });
+
+nav.addEventListener('click', e => {
+  if (e.target.tagName === 'A') {
+    nav.classList.remove('nav--open');
+  }
+});
 
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
-  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-}, {threshold: .15}) : null;
-document.querySelectorAll('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('reveal--visible');
+      io.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.15}) : null;
+
+document.querySelectorAll('.reveal').forEach(el => {
+  io ? io.observe(el) : el.classList.add('reveal--visible');
+});
 
 // form validation
 const form = document.getElementById('form');
@@ -72,7 +88,7 @@ form.addEventListener('submit', e => {
   e.preventDefault();
   let ok = true;
   form.querySelectorAll('[required]').forEach(f => {
-    const err = f.parentElement.querySelector('.err');
+    const err = f.parentElement.querySelector('.form__error');
     let msg = '';
     if (!f.value.trim()) msg = 'Заполните это поле';
     else if (f.type === 'tel' && f.value.replace(/\D/g, '').length < 10) msg = 'Введите телефон полностью';
